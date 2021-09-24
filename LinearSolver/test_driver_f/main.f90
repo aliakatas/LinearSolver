@@ -9,6 +9,7 @@
     implicit none
     
     integer, parameter          :: NMAX = 6
+    integer, parameter          :: MAX_EXPORT_SIZE = 2000
     
 #ifdef _DP    
     real(DP), parameter         :: ST = -5., fn = 9.
@@ -79,14 +80,17 @@
     call cpu_time(tfinish)
     write(*, '("?gemv time = ",f6.3," seconds.")') tfinish - tstart
     
-    write(*,*) "Saving RHS vectors..."
-    call cpu_time(tstart)
-    call pretty_write(matrix, 'matrix.log')
-    call pretty_write(vector_solution, 'solution.log')
-    call pretty_write(vector_rhs, 'vector_rhs.log')
-    call pretty_write(vector_rhs_blas, 'vector_rhs_blas.log')
-    call cpu_time(tfinish)
-    write(*, '("Writing time = ",f6.3," seconds.")') tfinish - tstart
+    if (N < MAX_EXPORT_SIZE) then
+        write(*,*) ''
+        write(*,*) "Saving arrays..."
+        call cpu_time(tstart)
+        call pretty_write(matrix, 'matrix.log')
+        call pretty_write(vector_solution, 'solution.log')
+        call pretty_write(vector_rhs, 'vector_rhs.log')
+        call pretty_write(vector_rhs_blas, 'vector_rhs_blas.log')
+        call cpu_time(tfinish)
+        write(*, '("Writing time = ",f6.3," seconds.")') tfinish - tstart
+    end if
     
     write(*,*) ''
     call test_tridiagonal_solver(matrix, N, vector_rhs_blas, vector_solution, err)
