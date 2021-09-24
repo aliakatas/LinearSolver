@@ -1,7 +1,8 @@
 
-program hello
-    use initialisation
-    use pretty_print
+    
+    program hello
+    !use initialisation
+    !use pretty_print
     implicit none
 
     real, allocatable       :: matrix(:,:), vector_original(:), vector_result(:), vector_calculated(:)
@@ -18,10 +19,10 @@ program hello
     st = -5.
     fn = 9.
 
-    call initialise_tridiagonal(matrix, N, 1., -2., 1.)
-    call initialise_to_random(vector_original, N, st, fn)
-
-    vector_result = matmul(matrix, vector_original)
+    !call initialise_tridiagonal(matrix, N, 1., -2., 1.)
+    !call initialise_to_random(vector_original, N, st, fn)
+    !
+    !vector_result = matmul(matrix, vector_original)
 
     print *, "Hello World!"
 
@@ -29,6 +30,9 @@ program hello
 
 
     print *, "Done!"
-
-end program
+#ifdef _VSBUILD    
+    print *, "Press Enter to exit..."
+    read(*,*)
+#endif 
+    end program
 
