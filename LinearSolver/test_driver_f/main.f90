@@ -1,8 +1,8 @@
 
     
     program hello
-    !use initialisation
-    !use pretty_print
+    use initialisation
+    use pretty_print
     implicit none
 
     real, allocatable       :: matrix(:,:), vector_original(:), vector_result(:), vector_calculated(:)
@@ -18,14 +18,14 @@
 
     st = -5.
     fn = 9.
-
-    !call initialise_tridiagonal(matrix, N, 1., -2., 1.)
-    !call initialise_to_random(vector_original, N, st, fn)
-    !
-    !vector_result = matmul(matrix, vector_original)
-
-    print *, "Hello World!"
-
+    
+    print *, "Initialising arrays..."
+    call initialise_tridiagonal(matrix, N, 1., -2., 1.)
+    call initialise_to_random(vector_original, N, st, fn)
+    
+    vector_result = matmul(matrix, vector_original)
+    
+    
 
 
 
