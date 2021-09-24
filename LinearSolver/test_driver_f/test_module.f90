@@ -3,6 +3,8 @@
     use custom_precision
     use comparison
     use pretty_print
+    use solver_preparation
+    use ascii_io
     
     implicit none
     
@@ -24,7 +26,11 @@
     procedure test_tridiagonal_solver_xp_dp
     end interface
     
-    public test_tridiagonal_solver, test_tridiagonal_solver_xp
+    interface test_poisson_solver
+    procedure test_poisson_solver_sp
+    end interface 
+    
+    public test_tridiagonal_solver, test_tridiagonal_solver_xp, test_poisson_solver
     
     contains
     
@@ -322,5 +328,115 @@
     deallocate(d, dl, du, local_sol)
     end subroutine test_tridiagonal_solver_xp_dp
     
+    !#####################################################
+    subroutine test_poisson_solver_sp(nrows, ncols, dx, dy)
+    integer, intent(in)                 :: nrows, ncols
+    real(SP), intent(in)                :: dx, dy
+    
+    integer                             :: N, irow, icol, k, npiv
+    real(SP), allocatable               :: Q(:), Qold(:), coefs(:,:), grid(:,:)
+    integer                             :: info, alloc_stat
+    integer, allocatable                :: ipiv(:)
+    
+    N = nrows * ncols
+    npiv = max(1, min(nrows, ncols))
+    
+    allocate(Q(N), stat=alloc_stat)
+    if (alloc_stat /= 0) then
+        write(*,*) "ERROR: during required arrays allocation Q...!"
+        return
+    end if
+    
+    allocate(Qold(N), stat=alloc_stat)
+    if (alloc_stat /= 0) then
+        write(*,*) "ERROR: during required arrays allocation Qold...!"
+        return
+    end if
+    
+    allocate(coefs(N,N), stat=alloc_stat)
+    if (alloc_stat /= 0) then
+        write(*,*) "ERROR: during required arrays allocation coefs...!"
+        return
+    end if
+    
+    allocate(grid(nrows, ncols), stat=alloc_stat)
+    if (alloc_stat /= 0) then
+        write(*,*) "ERROR: during required arrays allocation grid...!"
+        return
+    end if
+    
+    allocate(ipiv(npiv), stat=alloc_stat)
+    if (alloc_stat /= 0) then
+        write(*,*) "ERROR: during required arrays allocation ipiv...!"
+        return
+    end if
+    
+    
+    Q(:) = 0.
+    
+    ! inner points
+    do icol = 2, ncols - 1
+        do irow = 2, nrows - 1
+            k = get_linear_index(irow, icol, nrows)
+            Q(k) = icol
+        end do
+    end do
+    
+    ! left boundary
+    icol = 1
+    do irow = 1, nrows
+        k = get_linear_index(irow, icol, nrows)
+        Q(k) = 4.0
+    end do
+    
+    ! right boundary
+    icol = ncols
+    do irow = 2, nrows- 1
+        k = get_linear_index(irow, icol, nrows)
+        Q(k) = icol - 3. * 0.2 / dx
+    end do
+    
+    ! top boundary
+    irow = nrows
+    do icol = 1, ncols
+        k = get_linear_index(irow, icol, nrows)
+        Q(k) = 4.0
+    end do
+    
+    ! bottom boundary
+    irow = 1
+    do icol = 1, ncols
+        k = get_linear_index(irow, icol, nrows)
+        Q(k) = 4.0
+    end do
+    
+    call fill_coefficient_matrix_poisson(coefs, nrows, ncols, dx, dy)
+    call fill_coefficient_matrix_poisson_dirichlet_left(coefs, nrows, ncols)
+    call fill_coefficient_matrix_poisson_neumann_right(coefs, nrows, ncols, dx, dy)
+    call fill_coefficient_matrix_poisson_dirichlet_bottom(coefs, nrows, ncols)
+    call fill_coefficient_matrix_poisson_dirichlet_top(coefs, nrows, ncols)
+    
+    call map_vector_components_to_grid(Q, N, grid, nrows, ncols)
+    call export_to_ascii('before_solution.asc', nrows, ncols, grid, -9999., 0., 0., dx)
+    
+    call sgetrf(N, N, coefs, N, ipiv, info)
+    if (info /= 0) then
+        write(*,*) "ERROR: during coefficient matrix factorisation..."
+        deallocate(Q, Qold, coefs, grid, ipiv)
+        return 
+    end if
+    
+    call sgetrs('N', N, 1, coefs, N, ipiv, Q, N, info)
+    if (info /= 0) then
+        write(*,*) "ERROR: during system solution process..."
+        deallocate(Q, Qold, coefs, grid, ipiv)
+        return 
+    end if
+    
+    call map_vector_components_to_grid(Q, N, grid, nrows, ncols)
+    call export_to_ascii('after_solution.asc', nrows, ncols, grid, -9999., 0., 0., dx)
+    
+    deallocate(Q, Qold, coefs, grid, ipiv)
+    end subroutine test_poisson_solver_sp
     
     end module test

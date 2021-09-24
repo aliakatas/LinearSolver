@@ -44,9 +44,10 @@
     procedure fill_coefficient_matrix_poisson_dirichlet_top_dp
     end interface 
     
+    public get_linear_index
     public serialise_grid_nodes
     public map_vector_components_to_grid
-    public fill_coefficient_matrix
+    public fill_coefficient_matrix_poisson
     public fill_coefficient_matrix_poisson_dirichlet_left
     public fill_coefficient_matrix_poisson_neumann_right
     public fill_coefficient_matrix_poisson_dirichlet_bottom
@@ -81,7 +82,7 @@
     !#####################################
     subroutine serialise_grid_nodes_sp(grid, vector, nrows, ncols)
     real(SP), allocatable, intent(in)           :: grid(:,:)
-    real(SP), allocatable, intent(out)          :: vector(:)
+    real(SP), allocatable, intent(inout)        :: vector(:)
     integer, intent(in)                         :: nrows, ncols
     
     i = 1
@@ -96,7 +97,7 @@
     !#####################################
     subroutine serialise_grid_nodes_dp(grid, vector, nrows, ncols)
     real(DP), allocatable, intent(in)           :: grid(:,:)
-    real(DP), allocatable, intent(out)          :: vector(:)
+    real(DP), allocatable, intent(inout)        :: vector(:)
     integer, intent(in)                         :: nrows, ncols
     
     i = 1
@@ -111,12 +112,12 @@
     !#####################################
     subroutine map_vector_components_to_grid_sp(vector, n, grid, nrows, ncols)
     real(SP), allocatable, intent(in)           :: vector(:)
-    real(SP), allocatable, intent(out)          :: grid(:,:)
+    real(SP), allocatable, intent(inout)        :: grid(:,:)
     integer, intent(in)                         :: n, nrows, ncols
     
     do i = 1, n
         irow = get_row_id(i, nrows)
-        icol = get_column_id(i, ncols)
+        icol = get_column_id(i, nrows)
         grid(irow, icol) = vector(i)
     end do
     end subroutine map_vector_components_to_grid_sp
@@ -124,12 +125,12 @@
     !#####################################
     subroutine map_vector_components_to_grid_dp(vector, n, grid, nrows, ncols)
     real(DP), allocatable, intent(in)           :: vector(:)
-    real(DP), allocatable, intent(out)          :: grid(:,:)
+    real(DP), allocatable, intent(inout)        :: grid(:,:)
     integer, intent(in)                         :: n, nrows, ncols
     
     do i = 1, n
         irow = get_row_id(i, nrows)
-        icol = get_column_id(i, ncols)
+        icol = get_column_id(i, nrows)
         grid(irow, icol) = vector(i)
     end do
     end subroutine map_vector_components_to_grid_dp
@@ -199,7 +200,7 @@
     
     icol = 1
     do irow = 1, nrows
-        k = get_linear_index(irow, icol, ncols)
+        k = get_linear_index(irow, icol, nrows)
         mat(k, k) = 1.
     end do
     end subroutine fill_coefficient_matrix_poisson_dirichlet_left_sp
@@ -213,7 +214,7 @@
     
     icol = 1
     do irow = 1, nrows
-        k = get_linear_index(irow, icol, ncols)
+        k = get_linear_index(irow, icol, nrows)
         mat(k, k) = 1.d0
     end do
     end subroutine fill_coefficient_matrix_poisson_dirichlet_left_dp
@@ -232,12 +233,12 @@
     
     icol = ncols
     do irow = 2, nrows - 1
-        k = get_linear_index(irow, icol, ncols)
+        k = get_linear_index(irow, icol, nrows)
         mat(k, k) = -(7. / (2. * dx2) + (2. / dy2))
         mat(k, k - 1) = 1. / dy2
         mat(k, k + 1) = 1. / dy2
-        mat(k, k - ncols) = 4. / dx2
-        mat(k, k + ncols) = -1. / (2. * dx2)
+        mat(k, k - nrows) = 4. / dx2
+        mat(k, k + nrows) = -1. / (2. * dx2)
     end do
     end subroutine fill_coefficient_matrix_poisson_neumann_right_sp
     
@@ -255,12 +256,12 @@
     
     icol = ncols
     do irow = 2, nrows - 1
-        k = get_linear_index(irow, icol, ncols)
+        k = get_linear_index(irow, icol, nrows)
         mat(k, k) = -(7.d0 / (2.d0 * dx2) + (2.d0 / dy2))
         mat(k, k - 1) = 1.d0 / dy2
         mat(k, k + 1) = 1.d0 / dy2
-        mat(k, k - ncols) = 4.d0 / dx2
-        mat(k, k + ncols) = -1.d0 / (2.d0 * dx2)
+        mat(k, k - nrows) = 4.d0 / dx2
+        mat(k, k + nrows) = -1.d0 / (2.d0 * dx2)
     end do
     end subroutine fill_coefficient_matrix_poisson_neumann_right_dp
     
@@ -273,7 +274,7 @@
     
     irow = 1
     do icol = 1, ncols
-        k = get_linear_index(irow, icol, ncols)
+        k = get_linear_index(irow, icol, nrows)
         mat(k, k) = 1.
     end do
     end subroutine fill_coefficient_matrix_poisson_dirichlet_bottom_sp
@@ -287,7 +288,7 @@
     
     irow = 1
     do icol = 1, ncols
-        k = get_linear_index(irow, icol, ncols)
+        k = get_linear_index(irow, icol, nrows)
         mat(k, k) = 1.d0
     end do
     end subroutine fill_coefficient_matrix_poisson_dirichlet_bottom_dp
@@ -301,7 +302,7 @@
     
     irow = nrows
     do icol = 1, ncols
-        k = get_linear_index(irow, icol, ncols)
+        k = get_linear_index(irow, icol, nrows)
         mat(k, k) = 1.
     end do
     end subroutine fill_coefficient_matrix_poisson_dirichlet_top_sp
@@ -315,7 +316,7 @@
     
     irow = nrows
     do icol = 1, ncols
-        k = get_linear_index(irow, icol, ncols)
+        k = get_linear_index(irow, icol, nrows)
         mat(k, k) = 1.d0
     end do
     end subroutine fill_coefficient_matrix_poisson_dirichlet_top_dp

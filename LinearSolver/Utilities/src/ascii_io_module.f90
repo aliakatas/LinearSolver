@@ -154,7 +154,7 @@
     subroutine read_from_ascii_data_sp(fname, d, nrows, ncols)
     character(*), intent(in)                :: fname
     real(SP), allocatable, intent(out)      :: d(:,:)
-    integer, intent(out)                    :: nrows, ncols
+    integer, intent(in)                     :: nrows, ncols
     
     open(newunit=fid, file=fname, status='unknown')
     
@@ -172,7 +172,7 @@
     subroutine read_from_ascii_data_dp(fname, d, nrows, ncols)
     character(*), intent(in)                :: fname
     real(DP), allocatable, intent(out)      :: d(:,:)
-    integer, intent(out)                    :: nrows, ncols
+    integer, intent(in)                     :: nrows, ncols
     
     open(newunit=fid, file=fname, status='unknown')
     
@@ -190,7 +190,7 @@
     subroutine read_from_ascii_data_int(fname, d, nrows, ncols)
     character(*), intent(in)                :: fname
     integer, allocatable, intent(out)       :: d(:,:)
-    integer, intent(out)                    :: nrows, ncols
+    integer, intent(in)                     :: nrows, ncols
     
     open(newunit=fid, file=fname, status='unknown')
     

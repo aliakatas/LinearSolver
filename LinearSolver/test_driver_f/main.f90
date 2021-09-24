@@ -106,6 +106,11 @@
         goto 100
     end if
     
+    call cpu_time(tstart)
+    call test_poisson_solver(200, 135, 0.1, 0.1)
+    call cpu_time(tfinish)
+    write(*, '("Poisson solver run time = ",f6.3," seconds.")') tfinish - tstart
+    
     call cpu_time(tfinish)
     write(*, '("Total run time = ",f6.3," seconds.")') tfinish - tstart_total
     
