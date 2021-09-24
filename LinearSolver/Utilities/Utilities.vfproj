@@ -65,5 +65,6 @@
 		<File RelativePath=".\src\comparison_module.f90"/>
 		<File RelativePath=".\src\initialisation_module.f90"/>
 		<File RelativePath=".\src\precision_module.f90"/>
-		<File RelativePath=".\src\pretty_print_module.f90"/></Filter></Files>
+		<File RelativePath=".\src\pretty_print_module.f90"/>
+		<File RelativePath=".\src\solver_preparation_module.f90"/></Filter></Files>
 	<Globals/></VisualStudioProject>
