@@ -23,14 +23,7 @@
     procedure pretty_write_1D_dp
     end interface
     
-    interface export_to_ascii
-    procedure export_to_ascii_sp
-    procedure export_to_ascii_dp
-    procedure export_to_ascii_int
-    end interface
-    
     public pretty_write
-    public export_to_ascii
     
     contains
     
@@ -177,86 +170,5 @@
     write(fid, separator_format) separator
     close(fid)
     end subroutine pretty_write_1D_dp
-    
-    !#############################################
-    subroutine export_to_ascii_sp(fname, nrows, ncols, d, nodata, xll, yll, dx)
-    character(*), intent(in)                :: fname
-    integer, intent(in)                     :: nrows, ncols
-    real(SP), allocatable, intent(in)       :: d(:,:) 
-    real(SP), intent(in)                    :: nodata
-    real(SP), intent(in)                    :: xll, yll, dx
-    
-    integer                                 :: irow, icol
-    
-    open(newunit=fid, file=fname, status='unknown')
-    
-    write(fid, '("ncols          ", I10)') ncols
-    write(fid, '("nrows          ", I10)') nrows
-    write(fid, '("xllcorner      ", F12.4)') xll
-    write(fid, '("yllcorner      ", F12.4)') yll
-    write(fid, '("cellsize       ", F12.4)') dx
-    write(fid, '("NODATA_value   ", F12.4)') nodata
-    
-    do irow = nrows, 1, -1
-        do icol = 1, ncols
-            write(fid, float_format) d(irow, icol)
-        end do
-        write(fid, *) ''
-    end do
-    end subroutine export_to_ascii_sp
-    
-    !#############################################
-    subroutine export_to_ascii_dp(fname, nrows, ncols, d, nodata, xll, yll, dx)
-    character(*), intent(in)                :: fname
-    integer, intent(in)                     :: nrows, ncols
-    real(DP), allocatable, intent(in)       :: d(:,:) 
-    real(DP), intent(in)                    :: nodata
-    real(DP), intent(in)                    :: xll, yll, dx
-    
-    integer                                 :: irow, icol
-    
-    open(newunit=fid, file=fname, status='unknown')
-    
-    write(fid, '("ncols          ", I10)') ncols
-    write(fid, '("nrows          ", I10)') nrows
-    write(fid, '("xllcorner      ", F12.4)') xll
-    write(fid, '("yllcorner      ", F12.4)') yll
-    write(fid, '("cellsize       ", F12.4)') dx
-    write(fid, '("NODATA_value   ", F12.4)') nodata
-    
-    do irow = nrows, 1, -1
-        do icol = 1, ncols
-            write(fid, float_format) d(irow, icol)
-        end do
-        write(fid, *) ''
-    end do
-    end subroutine export_to_ascii_dp
-    
-    !#############################################
-    subroutine export_to_ascii_int(fname, nrows, ncols, d, nodata, xll, yll, dx)
-    character(*), intent(in)                :: fname
-    integer, intent(in)                     :: nrows, ncols
-    integer, allocatable, intent(in)        :: d(:,:) 
-    integer, intent(in)                     :: nodata
-    real, intent(in)                        :: xll, yll, dx
-    
-    integer                                 :: irow, icol
-    
-    open(newunit=fid, file=fname, status='unknown')
-    
-    write(fid, '("ncols          ", I10)') ncols
-    write(fid, '("nrows          ", I10)') nrows
-    write(fid, '("xllcorner      ", F12.4)') xll
-    write(fid, '("yllcorner      ", F12.4)') yll
-    write(fid, '("cellsize       ", F12.4)') dx
-    write(fid, '("NODATA_value   ", I10)') nodata
-    
-    do irow = nrows, 1, -1
-        do icol = 1, ncols
-            write(fid, '(I10,1X)') d(irow, icol)
-        end do
-        write(fid, *) ''
-    end do
-    end subroutine export_to_ascii_int
 
     end module pretty_print
